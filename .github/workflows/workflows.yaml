@@ -80,7 +80,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
       - name: Extract metadata for backend image
         id: meta-image
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v4
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           images: ghcr.io/evellama/evellama-workflows
