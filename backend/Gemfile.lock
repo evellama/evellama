@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/bokoboshahni/omniauth-eve_online.git
-  revision: dfdc81bdded49fb074a5cf9b64fd1236f25267a9
+  revision: dc4f53cf395118ce0040e866e4db6aa1611ef936
   specs:
     omniauth-eve_online (0.1.0)
       jwt (~> 2.5)
