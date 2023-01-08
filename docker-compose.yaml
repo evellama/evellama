@@ -1,0 +1,472 @@
+---
+version: '3'
+x-backend-common: &backend-common
+  build:
+    context: ./backend
+    dockerfile: Dockerfile.dev
+  depends_on:
+    redis-cache:
+      condition: service_healthy
+    redis-circuitbreaker:
+      condition: service_healthy
+    redis-ratelimiter:
+      condition: service_healthy
+    timescaledb:
+      condition: service_healthy
+  env_file:
+    - ./.env
+  environment:
+    DATABASE_URL: postgres://postgres:postgres@timescaledb:5432/evellama_development
+    BOOTSNAP_CACHE_DIR: /usr/local/bundle/_bootsnap
+    XDG_DATA_HOME: /app/tmp/cache
+    YARN_CACHE_FOLDER: /app/node_modules/.yarn-cache
+    HISTFILE: /usr/local/hist/.bash_history
+    PSQL_HISTFILE: /usr/local/hist/.psql_history
+    IRB_HISTFILE: /usr/local/hist/.irb_history
+    EDITOR: vim
+    MALLOC_ARENA_MAX: 2
+    WEB_CONCURRENCY: ${WEB_CONCURRENCY:-1}
+  volumes:
+    - ./backend:/app
+    - backend-assets:/app/assets/builds
+    - backend-cache:/app/tmp/cache
+    - backend-bundle:/usr/local/bundle
+    - backend-history:/usr/local/hist
+    - backend-node_modules:/app/node_modules
+  stdin_open: true
+  tty: true
+
+x-workflow-common: &workflow-common
+  build:
+    context: ./workflows
+  environment: &workflow-common-env
+    AIRFLOW__CORE__EXECUTOR: CeleryExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@workflow-postgres/airflow
+    AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@workflow-postgres/airflow
+    AIRFLOW__CELERY__BROKER_URL: redis://:@workflow-redis:6379/0
+    AIRFLOW__CELERY__WORKER_CONCURRENCY: 32
+    AIRFLOW__CORE__FERNET_KEY: ''
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+    AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
+    _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    PYTHONOPTIMIZE: '1'
+  volumes:
+    - ./workflows/dags:/opt/airflow/dags
+    - ./workflows/data:/opt/airflow/data
+    - ./workflows/log/airflow:/opt/airflow/logs
+    - ./workflows/notebooks:/opt/airflow/notebooks
+    - ./workflows/plugins:/opt/airflow/plugins
+  user: "${UID}:0"
+  depends_on: &workflow-common-depends-on
+    workflow-redis:
+      condition: service_healthy
+    workflow-postgres:
+      condition: service_healthy
+
+services:
+  minio:
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9090"
+    ports:
+      - 9000:9000
+      - 9090:9090
+    user: "${UID}:${GID}"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    restart: always
+    volumes:
+      - ./storage/minio:/data
+
+  opensearch: # This is also the hostname of the container within the Docker network (i.e. https://opensearch-node1/)
+    image: opensearchproject/opensearch:latest # Specifying the latest available image - modify if you want a specific version
+    container_name: evellama-opensearch
+    environment:
+      - cluster.name=opensearch-cluster # Name the cluster
+      - node.name=evellama-opensearch # Name the node that will run in this container
+      - discovery.seed_hosts=evellama-opensearch # Nodes to look for when discovering the cluster
+      - cluster.initial_cluster_manager_nodes=evellama-opensearch # Nodes eligibile to serve as cluster manager
+      - bootstrap.memory_lock=true # Disable JVM heap memory swapping
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m" # Set min and max JVM heap sizes to at least 50% of system RAM
+      - "DISABLE_INSTALL_DEMO_CONFIG=true" # Prevents execution of bundled demo script which installs demo certificates and security configurations to OpenSearch
+      - "DISABLE_SECURITY_PLUGIN=true" # Disables security plugin
+    ulimits:
+      memlock:
+        soft: -1 # Set memlock to unlimited (no soft or hard limit)
+        hard: -1
+      nofile:
+        soft: 65536 # Maximum number of open files for the opensearch user - set to at least 65536
+        hard: 65536
+    volumes:
+      - opensearch-data-volume:/usr/share/opensearch/data # Creates volume called opensearch-data1 and mounts it to the container
+    ports:
+      - 9200:9200 # REST API
+      - 9600:9600 # Performance Analyzer
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest # Make sure the version of opensearch-dashboards matches the version of opensearch installed on other nodes
+    ports:
+      - 5601:5601 # Map host port 5601 to container port 5601
+    expose:
+      - "5601" # Expose port 5601 for web access to OpenSearch Dashboards
+    environment:
+      OPENSEARCH_HOSTS: '["https://opensearch-node1:9200","https://opensearch-node2:9200"]' # Define the OpenSearch nodes that OpenSearch Dashboards will query
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true" # disables security dashboards plugin in OpenSearch Dashboards
+
+  redis-cache:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 1gb --maxmemory-policy allkeys-lru --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+    volumes:
+      - redis-cache-volume:/data
+
+  redis-circuitbreaker:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 50mb --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+    volumes:
+      - redis-circuitbreaker-volume:/data
+
+  redis-ratelimiter:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 50mb --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+    volumes:
+      - redis-ratelimiter-volume:/data
+
+  timescaledb:
+    image: timescale/timescaledb-ha:pg14-latest
+    platform: linux/amd64
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - timescaledb-volume:/home/postgres/pgdata/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      retries: 5
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    ports:
+      - "5050:5050"
+    restart: always
+
+  api:
+    build: ./api
+    depends_on: &service-depends-on
+      redis-cache:
+        condition: service_healthy
+      redis-circuitbreaker:
+        condition: service_healthy
+      redis-ratelimiter:
+        condition: service_healthy
+      timescaledb:
+        condition: service_healthy
+    env_file:
+      - ./.env
+    environment:
+      EVELLAMA_BACKEND_DATABASE_URL: postgresql+psycopg2://postgres:postgres@timescaledb:5432/evellama_backend_development
+      EVELLAMA_ANALYTICS_DATABASE_URL: postgres+psycopg2://postgres:postgres@timescaledb:5432/evellama_analytics_development
+    user: "${UID}:${GID}"
+    volumes:
+      - ./api:/app:cached
+    ports:
+      - "8000:8000"
+    restart: always
+
+  backend-rails:
+    <<: *backend-common
+    command: bundle exec rails
+
+  backend-web:
+    <<: *backend-common
+    command: bundle exec rails server
+    ports:
+      - "3000:3000"
+
+  backend-worker:
+    <<: *backend-common
+    command: bundle exec sidekiq
+
+  backend-css:
+    <<: *backend-common
+    command: yarn build:css --watch
+
+  backend-js:
+    <<: *backend-common
+    command: yarn build --watch
+
+  backend-memcached:
+    image: memcached:1.6-alpine
+    command: memcached -m 1024
+    restart: always
+
+  backend-redis-cable:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 1gb --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+    volumes:
+      - backend-redis-cable-volume:/data
+
+  backend-redis-queue:
+    image: redis:7-alpine
+    command: redis-server --maxmemory 1gb --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+    volumes:
+      - backend-redis-queue-volume:/data
+
+  workflow-postgres:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - workflow-postgres-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+    restart: always
+
+  workflow-redis:
+    image: redis:7-alpine
+    command: redis-server --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: always
+    volumes:
+      - workflow-redis-volume:/data
+
+  workflow-webserver:
+    <<: *workflow-common
+    command: webserver
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *workflow-common-depends-on
+      workflow-init:
+        condition: service_completed_successfully
+
+  workflow-scheduler:
+    <<: *workflow-common
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *workflow-common-depends-on
+      workflow-init:
+        condition: service_completed_successfully
+
+  workflow-worker:
+    <<: *workflow-common
+    command: celery worker
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - 'celery --app airflow.executors.celery_executor.app inspect ping -d "celery@$${HOSTNAME}"'
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    environment:
+      <<: *workflow-common-env
+      # Required to handle warm shutdown of the celery workers properly
+      # See https://airflow.apache.org/docs/docker-stack/entrypoint.html#signal-propagation
+      DUMB_INIT_SETSID: "0"
+    restart: always
+    depends_on:
+      <<: *workflow-common-depends-on
+      workflow-init:
+        condition: service_completed_successfully
+    deploy:
+      replicas: 2
+
+  workflow-triggerer:
+    <<: *workflow-common
+    command: triggerer
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *workflow-common-depends-on
+      workflow-init:
+        condition: service_completed_successfully
+
+  workflow-flower:
+    <<: *workflow-common
+    command: celery flower
+    ports:
+      - 5555:5555
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: always
+    depends_on:
+      <<: *workflow-common-depends-on
+      workflow-init:
+        condition: service_completed_successfully
+
+  workflow-init:
+    <<: *workflow-common
+    entrypoint: /bin/bash
+    # yamllint disable rule:line-length
+    command:
+      - -c
+      - |
+        function ver() {
+          printf "%04d%04d%04d%04d" $${1//./ }
+        }
+        airflow_version=$$(AIRFLOW__LOGGING__LOGGING_LEVEL=INFO && gosu airflow airflow version)
+        airflow_version_comparable=$$(ver $${airflow_version})
+        min_airflow_version=2.2.0
+        min_airflow_version_comparable=$$(ver $${min_airflow_version})
+        if (( airflow_version_comparable < min_airflow_version_comparable )); then
+          echo
+          echo -e "\033[1;31mERROR!!!: Too old Airflow version $${airflow_version}!\e[0m"
+          echo "The minimum Airflow version supported: $${min_airflow_version}. Only use this or higher!"
+          echo
+          exit 1
+        fi
+        if [[ -z "${UID}" ]]; then
+          echo
+          echo -e "\033[1;33mWARNING!!!: UID not set!\e[0m"
+          echo "If you are on Linux, you SHOULD follow the instructions below to set "
+          echo "UID environment variable, otherwise files will be owned by root."
+          echo "For other operating systems you can get rid of the warning with manually created .env file:"
+          echo "    See: https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#setting-the-right-airflow-user"
+          echo
+        fi
+        one_meg=1048576
+        mem_available=$$(($$(getconf _PHYS_PAGES) * $$(getconf PAGE_SIZE) / one_meg))
+        cpus_available=$$(grep -cE 'cpu[0-9]+' /proc/stat)
+        disk_available=$$(df / | tail -1 | awk '{print $$4}')
+        warning_resources="false"
+        if (( mem_available < 4000 )) ; then
+          echo
+          echo -e "\033[1;33mWARNING!!!: Not enough memory available for Docker.\e[0m"
+          echo "At least 4GB of memory required. You have $$(numfmt --to iec $$((mem_available * one_meg)))"
+          echo
+          warning_resources="true"
+        fi
+        if (( cpus_available < 2 )); then
+          echo
+          echo -e "\033[1;33mWARNING!!!: Not enough CPUS available for Docker.\e[0m"
+          echo "At least 2 CPUs recommended. You have $${cpus_available}"
+          echo
+          warning_resources="true"
+        fi
+        if (( disk_available < one_meg * 10 )); then
+          echo
+          echo -e "\033[1;33mWARNING!!!: Not enough Disk space available for Docker.\e[0m"
+          echo "At least 10 GBs recommended. You have $$(numfmt --to iec $$((disk_available * 1024 )))"
+          echo
+          warning_resources="true"
+        fi
+        if [[ $${warning_resources} == "true" ]]; then
+          echo
+          echo -e "\033[1;33mWARNING!!!: You have not enough resources to run Airflow (see above)!\e[0m"
+          echo "Please follow the instructions to increase amount of resources available:"
+          echo "   https://airflow.apache.org/docs/apache-airflow/stable/howto/docker-compose/index.html#before-you-begin"
+          echo
+        fi
+        mkdir -p /sources/logs /sources/dags /sources/plugins
+        chown -R "${UID}:0" /sources/{logs,dags,plugins}
+        exec /entrypoint airflow version
+    # yamllint enable rule:line-length
+    environment:
+      <<: *workflow-common-env
+      _AIRFLOW_DB_UPGRADE: 'true'
+      _AIRFLOW_WWW_USER_CREATE: 'true'
+      _AIRFLOW_WWW_USER_USERNAME: ${_AIRFLOW_WWW_USER_USERNAME:-airflow}
+      _AIRFLOW_WWW_USER_PASSWORD: ${_AIRFLOW_WWW_USER_PASSWORD:-airflow}
+      _PIP_ADDITIONAL_REQUIREMENTS: ''
+    user: "0:0"
+    volumes:
+      - ./workflow:/sources
+
+  workflow-cli:
+    <<: *workflow-common
+    profiles:
+      - debug
+    environment:
+      <<: *workflow-common-env
+      CONNECTION_CHECK_MAX_COUNT: "0"
+    # Workaround for entrypoint issue. See: https://github.com/apache/airflow/issues/16252
+    command:
+      - bash
+      - -c
+      - airflow
+
+networks:
+  default:
+    name: evellama
+
+volumes:
+  backend-assets:
+  backend-bundle:
+  backend-cache:
+  backend-history:
+  backend-node_modules:
+  backend-redis-cable-volume:
+  backend-redis-queue-volume:
+  opensearch-data-volume:
+  redis-cache-volume:
+  redis-circuitbreaker-volume:
+  redis-ratelimiter-volume:
+  timescaledb-volume:
+  workflow-postgres-volume:
+  workflow-redis-volume:
