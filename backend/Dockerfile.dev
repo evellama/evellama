@@ -1,0 +1,42 @@
+FROM ruby:3.1-alpine
+
+
+# ARG UID
+# ARG GID
+
+ENV LANG=C.UTF-8 \
+    BUNDLE_APP_CONFIG=.bundle \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=3
+
+RUN apk add --no-cache \
+      bash \
+      build-base \
+      curl-dev \
+      git \
+      libc6-compat \
+      libcurl \
+      nodejs \
+      postgresql-client \
+      postgresql-dev \
+      tzdata \
+      file \
+      vim \
+      yarn
+
+# RUN adduser -u ${UID} -S app
+
+RUN gem update --system && gem install bundler -v 2.4.1 && gem cleanup bundler
+
+RUN mkdir -p /app
+WORKDIR /app
+
+EXPOSE 3000
+
+# RUN chown -R app:app /usr/local/bundle && \
+#     mkdir -p /app/node_modules && \
+#     mkdir -p /app/tmp/cache && \
+#     chown -R app:app /app && \
+#     chown -R app:app /tmp
+
+CMD ["bundle", "exec", "rails", "console"]

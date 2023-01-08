@@ -1,0 +1,140 @@
+# frozen_string_literal: true
+
+source 'https://rubygems.org'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+
+ruby '~> 3.1'
+
+gem 'dotenv-rails', '~> 2.8'
+
+gem 'aasm', '~> 5.4'
+gem 'active_median', '~> 0.3.3'
+gem 'after_commit_everywhere', '~> 1.3'
+gem 'ahoy_matey', '~> 4.1'
+gem 'ancestry', '~> 4.2'
+gem 'authtrail', '~> 0.4.3'
+gem 'autosuggest', '~> 0.1.3'
+gem 'blazer', '~> 2.6'
+gem 'blind_index', '~> 2.3'
+gem 'bootsnap', '~> 1.15', require: false
+gem 'cityhash', '~> 0.9.0'
+gem 'composite_primary_keys', '~> 14.0'
+gem 'cssbundling-rails', '~> 1.1'
+gem 'dalli', '~> 3.2'
+gem 'devise', '~> 4.8'
+gem 'discard', '~> 1.2'
+# gem 'doorkeeper', '~> 5.6'
+gem 'aws-sdk-s3', '~> 1.117'
+gem 'down', '~> 5.4', require: false
+gem 'enumerable-statistics', '~> 2.0'
+gem 'faraday', '~> 2.7'
+gem 'faraday-detailed_logger', '~> 2.5'
+gem 'faraday-http-cache', '~> 2.4'
+gem 'faraday-retry', '~> 2.0'
+gem 'faraday-typhoeus', '~> 1.0'
+gem 'field_test', '~> 0.5.4'
+gem 'flamegraph', '~> 0.9.5'
+gem 'friendly_id', '~> 5.5'
+gem 'groupdate', '~> 6.1'
+gem 'heroicon', '~> 1.0'
+gem 'hightop', '~> 0.3.0'
+gem 'http', '~> 5.1', require: false
+gem 'hypershield', '~> 0.3.1'
+gem 'identity_cache', '~> 1.2'
+gem 'jbuilder', '~> 2.11'
+gem 'job-iteration', '~> 1.3'
+gem 'jsbundling-rails', '~> 1.1'
+gem 'kaminari', '~> 1.2'
+gem 'lockbox', '~> 1.1'
+gem 'lograge', '~> 0.12.0'
+gem 'lograge-sql', '~> 2.0'
+gem 'logstop', '~> 0.3.0'
+gem 'maintenance_tasks', '~> 2.0'
+gem 'memory_profiler', '~> 1.0'
+gem 'nanoid', '~> 2.0'
+gem 'notable', '~> 0.4.1'
+gem 'numo-narray', '~> 0.9.2'
+gem 'oj', '~> 3.13'
+gem 'omniauth-eve_online', github: 'bokoboshahni/omniauth-eve_online'
+gem 'paper_trail', '~> 14.0'
+gem 'pg', '~> 1.4'
+gem 'pghero', '~> 3.0'
+gem 'pg_query', '~> 2.2'
+gem 'pretender', '~> 0.4.0'
+gem 'prometheus_exporter', '~> 2.0'
+gem 'puma', '~> 5.0'
+gem 'pundit', '~> 2.3'
+gem 'rack-attack', '~> 6.6'
+gem 'rack-cors', '~> 1.1'
+gem 'rack-mini-profiler'
+gem 'rails', github: 'rails/rails', branch: '7-0-stable'
+gem 'redis', '~> 4.0'
+gem 'repost', '~> 0.4.1'
+gem 'retriable', '~> 3.1'
+gem 'rollup', '~> 0.1.0'
+gem 'rover', '~> 1.1'
+gem 'ruby-limiter', '~> 2.2'
+gem 'safely_block', '~> 0.3.0'
+gem 'scenic', '~> 1.7'
+gem 'searchjoy', '~> 1.0'
+gem 'searchkick', '~> 5.1'
+gem 'secure_headers', '~> 6.5'
+gem 'semian', '~> 0.16.0'
+gem 'semian-postgres', '~> 0.1.1'
+gem 'sentry-rails', '~> 5.7'
+gem 'sentry-ruby', '~> 5.7'
+gem 'sidekiq', '~> 6.5'
+gem 'sidekiq-cron', '~> 1.9'
+gem 'slack-ruby-client', '~> 2.0'
+gem 'slowpoke', '~> 0.4.0'
+gem 'sprockets-rails', '~> 3.4'
+gem 'ssrf_filter', '~> 1.1'
+gem 'stackprof', '~> 0.2.23'
+gem 'stimulus-rails', '~> 1.2'
+gem 'technical-analysis', '~> 0.2.4'
+gem 'timescaledb', '~> 0.2.5'
+gem 'turbo-rails', '~> 1.3'
+gem 'typhoeus', '~> 1.4'
+gem 'vega', '~> 0.3.0'
+gem 'view_component', '~> 2.80'
+
+group :development, :test do
+  gem 'awesome_print', '~> 1.9'
+  gem 'debug', '~> 1.7'
+  gem 'factory_bot_rails', '~> 6.2'
+  gem 'faker', '~> 3.1'
+  gem 'rspec-rails', '~> 6.0'
+end
+
+group :development do
+  gem 'annotate', '~> 3.2'
+  gem 'i18n-tasks', '~> 1.0'
+  gem 'lookbook', '~> 1.4'
+  gem 'strong_migrations', '~> 1.4'
+  gem 'web-console', '~> 4.2'
+end
+
+group :lint do
+  gem 'brakeman', '~> 5.4', require: false
+  gem 'bundler-audit', '~> 0.9.1', require: false
+  gem 'bundler-leak', '~> 0.3.0', require: false
+  gem 'database_consistency', '~> 1.7', require: false
+  gem 'erb_lint', '~> 0.3.1', require: false
+  gem 'rubocop', '~> 1.42', require: false
+  gem 'rubocop-faker', '~> 1.1', require: false
+  gem 'rubocop-graphql', '~> 0.18.0', require: false
+  gem 'rubocop-performance', '~> 1.15', require: false
+  gem 'rubocop-rails', '~> 2.17', require: false
+  gem 'rubocop-rake', '~> 0.6.0', require: false
+  gem 'rubocop-rspec', '~> 2.16', require: false
+  gem 'rubocop-thread_safety', '~> 0.4.4', require: false
+end
+
+group :test do
+  gem 'shoulda-matchers', '~> 5.3', require: false
+  gem 'simplecov', '~> 0.22.0', require: false
+  gem 'vcr', '~> 6.1', require: false
+  gem 'webmock', '~> 3.18', require: false
+end
+
+gem 'tty-command', '~> 0.10.1'

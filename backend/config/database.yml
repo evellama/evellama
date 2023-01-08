@@ -1,0 +1,31 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+
+development:
+  <<: *default
+  <% if ENV['DATABASE_URL'] %>
+  url: <%= ENV['DATABASE_URL'] %>
+  <% else %>
+  host: localhost
+  port: 5432
+  username: postgres
+  password: postgres
+  database: evellama_development
+  <% end %>
+
+test:
+  <<: *default
+  <% if ENV['CI'] %>
+  url: <%= ENV.fetch('DATABASE_URL') %>
+  <% else %>
+  host: localhost
+  port: 5432
+  username: postgres
+  password: postgres
+  database: evellama_test
+  <% end %>
+
+production:
+  <<: *default
+  url: <%= ENV['DATABASE_URL'] %>

@@ -1,0 +1,41 @@
+require:
+  - rubocop-faker
+  - rubocop-graphql
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-thread_safety
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.1
+  Exclude:
+    - 'bin/*'
+    - 'tmp/*'
+    - 'db/schema.rb'
+    - 'tmp/*'
+    - 'vendor/*'
+
+Lint/EmptyClass:
+  Enabled: false
+
+Metrics/AbcSize:
+  Exclude:
+    - 'db/migrate/*.rb'
+
+Metrics/BlockLength:
+  Exclude:
+    - 'db/migrate/*.rb'
+    - 'spec/**/*_spec.rb'
+
+Metrics/ClassLength:
+  Exclude:
+    - 'db/migrate/*.rb'
+
+Metrics/MethodLength:
+  Exclude:
+    - 'db/migrate/*.rb'
+
+Style/Documentation:
+  Enabled: false
