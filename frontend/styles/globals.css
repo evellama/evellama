@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .text-body-sm {
+    @apply text-xs;
+  }
+  .text-body-md {
+    @apply text-sm;
+  }
+  .text-body-lg {
+    @apply text-md;
+  }
+
+  .text-display-sm {
+    @apply text-4xl;
+  }
+  .text-display-md {
+    @apply text-5xl;
+  }
+  .text-display-lg {
+    @apply text-6xl;
+  }
+
+  .text-headline-sm {
+    @apply text-xl;
+  }
+  .text-headline-md {
+    @apply text-2xl;
+  }
+  .text-headline-lg {
+    @apply text-3xl;
+  }
+
+  .text-label-sm {
+    @apply text-2xs;
+  }
+  .text-label-md {
+    @apply text-xs;
+  }
+  .text-label-lg {
+    @apply text-sm;
+  }
+
+  .text-title-sm {
+    @apply text-sm;
+  }
+  .text-title-md {
+    @apply text-md;
+  }
+  .text-title-lg {
+    @apply text-lg;
+  }
+}

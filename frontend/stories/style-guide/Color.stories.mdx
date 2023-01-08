@@ -1,0 +1,249 @@
+import {
+  Canvas,
+  ColorPalette,
+  ColorItem,
+  Meta,
+  Story,
+} from '@storybook/addon-docs'
+
+<Meta title="Style Guide/Colors" />
+
+# Colors
+
+## Baseline palette
+
+<div class="container max-w-5xl p-4 mx-auto space-y-4 rounded-lg bg-background">
+  <div class="grid grid-cols-4">
+    <div class="relative flex flex-col h-32 p-4 bg-primary">
+      <span class="text-sm font-semibold text-left text-on-primary">
+        Primary
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-primary">
+        primary-100
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-on-primary">
+      <span class="text-sm font-semibold text-left text-primary">
+        On Primary
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-primary">
+        primary-800
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-primary-container">
+      <span class="text-sm font-semibold text-left text-on-primary-container">
+        Primary Container
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-primary-container">
+        primary-700
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-on-primary-container">
+      <span class="text-sm font-semibold text-left text-primary-container">
+        On Primary Container
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-primary-container">
+        primary-50
+      </span>
+    </div>
+  </div>
+  <div class="grid grid-cols-4">
+    <div class="relative flex flex-col h-32 p-4 bg-secondary">
+      <span class="text-sm font-semibold text-left text-on-secondary">
+        Secondary
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-secondary">
+        secondary-100
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-on-secondary">
+      <span class="text-sm font-semibold text-left text-secondary">
+        On Secondary
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-secondary">
+        secondary-800
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-secondary-container">
+      <span class="text-sm font-semibold text-left text-on-secondary-container">
+        Secondary Container
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-secondary-container">
+        secondary-700
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-on-secondary-container">
+      <span class="text-sm font-semibold text-left text-secondary-container">
+        On Secondary Container
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-secondary-container">
+        secondary-50
+      </span>
+    </div>
+  </div>
+  <div class="grid grid-cols-4">
+    <div class="relative flex flex-col h-32 p-4 bg-tertiary">
+      <span class="text-sm font-semibold text-left text-on-tertiary">
+        Tertiary
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-tertiary">
+        tertiary-100
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-on-tertiary">
+      <span class="text-sm font-semibold text-left text-tertiary">
+        On Tertiary
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-tertiary">
+        tertiary-800
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-tertiary-container">
+      <span class="text-sm font-semibold text-left text-on-tertiary-container">
+        Tertiary Container
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-tertiary-container">
+        tertiary-700
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-on-tertiary-container">
+      <span class="text-sm font-semibold text-left text-tertiary-container">
+        On Tertiary Container
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-tertiary-container">
+        tertiary-50
+      </span>
+    </div>
+  </div>
+  <div class="grid grid-cols-4">
+    <div class="relative flex flex-col h-32 p-4 bg-background">
+      <span class="text-sm font-semibold text-left text-on-background">
+        Background
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-background">
+        neutral-900
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-on-background">
+      <span class="text-sm font-semibold text-left text-background">
+        On Background
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-background">
+        neutral-50
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-surface">
+      <span class="text-sm font-semibold text-left text-on-surface">
+        Surface
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-surface">
+        surface-900
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-on-surface">
+      <span class="text-sm font-semibold text-left text-surface">
+        On Surface Container
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-surface">
+        surface-50
+      </span>
+    </div>
+  </div>
+  <div class="grid grid-cols-4">
+    <div class="relative flex flex-col h-32 p-4 bg-surface-variant">
+      <span class="text-sm font-semibold text-left text-on-surface-variant">
+        Surface Variant
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-surface-variant">
+        neutral-variant-700
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-on-surface-variant">
+      <span class="text-sm font-semibold text-left text-surface-variant">
+        On Surface Variant
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-surface-variant">
+        neutral-variant-100
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-outline">
+      <span class="text-sm font-semibold text-left text-on-outline">
+        Outline
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-outline">
+        neutral-variant-300
+      </span>
+    </div>
+    <div class="relative flex flex-col h-32 p-4 bg-outline-variant">
+      <span class="text-sm font-semibold text-left text-outline">
+        Outline Variant
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-outline">
+        neutral-variant-700
+      </span>
+    </div>
+  </div>
+</div>
+
+## Elevation
+
+<div class="container max-w-5xl p-4 mx-auto space-y-4 rounded-lg bg-background">
+  <div class="grid grid-cols-6">
+    <div class="relative flex flex-col h-32 p-4 bg-surface">
+      <span class="text-sm font-semibold text-left text-on-surface">
+        Surface
+      </span>
+      <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-surface"></span>
+    </div>
+    <div class="relative flex flex-col h-32 bg-surface">
+      <div class="h-32 p-4 bg-primary bg-opacity-elevation-1">
+        <span class="text-sm font-semibold text-left text-on-surface">
+          Surface 1
+        </span>
+        <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-surface">
+          5%
+        </span>
+      </div>
+    </div>
+    <div class="relative flex flex-col h-32 bg-surface">
+      <div class="h-32 p-4 bg-primary bg-opacity-elevation-2">
+        <span class="text-sm font-semibold text-left text-on-surface">
+          Surface 2
+        </span>
+        <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-surface">
+          8%
+        </span>
+      </div>
+    </div>
+    <div class="relative flex flex-col h-32 bg-surface">
+      <div class="h-32 p-4 bg-primary bg-opacity-elevation-3">
+        <span class="text-sm font-semibold text-left text-on-surface">
+          Surface 3
+        </span>
+        <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-surface">
+          11%
+        </span>
+      </div>
+    </div>
+    <div class="relative flex flex-col h-32 bg-surface">
+      <div class="h-32 p-4 bg-primary bg-opacity-elevation-4">
+        <span class="text-sm font-semibold text-left text-on-surface">
+          Surface 4
+        </span>
+        <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-surface">
+          12%
+        </span>
+      </div>
+    </div>
+    <div class="relative flex flex-col h-32 bg-surface">
+      <div class="h-32 p-4 bg-primary bg-opacity-elevation-5">
+        <span class="text-sm font-semibold text-left text-on-surface">
+          Surface 5
+        </span>
+        <span class="absolute text-sm font-semibold bottom-4 right-4 text-on-surface">
+          14%
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
