@@ -1,0 +1,8 @@
+evellama/(?!dags(/.*)?).*
+notebooks/.*
+plugins/.*
+tests/.*
+Dockerfile
+poetry\.lock
+pyproject\.toml
+requirements\.txt
