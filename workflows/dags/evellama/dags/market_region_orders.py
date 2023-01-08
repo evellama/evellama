@@ -86,7 +86,7 @@ def market_region_orders():
 
     @task_group(group_id="extract_transform_and_load_trades")
     def group_extract_transform_and_load_trades(extracted_orders):
-        @task(task_id="extract_trades", retries=3, max_active_tis_per_dag=1)
+        @task(task_id="extract_trades", retries=3)
         def task_extract_trades(extracted_orders):
             return extract_region_trades(extracted_orders)
 
