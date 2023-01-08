@@ -169,7 +169,6 @@ def transform_and_load_region_depths(extracted_orders):
 
 
 def load_market_region_depths_db(depths_paths):
-    engine = create_engine(Variable.get("EVELLAMA_DATABASE_URL"))
     depths_df = s3.read_parquet(list(depths_paths.values()))[
         [
             "region_id",
@@ -211,7 +210,13 @@ def load_market_region_depths_db(depths_paths):
         f"Transformed {len(levels_df)} depth snapshot(s) for {len(MARKET_REGION_DEPTH_SNAPSHOT_REGION_IDS)} region(s) in {end_time - start_time:0.4f} seconds"
     )
 
+    database_url = Variable.get("EVELLAMA_DATABASE_URL", default_var=None)
+    if not database_url:
+        warning(f"EVELLAMA_DATABASE_URL is not configured. Depth snapshots will not be loaded into the database.")
+        return
+
     start_time = time.perf_counter()
+    engine = create_engine(Variable.get("EVELLAMA_DATABASE_URL"))
     conn = engine.raw_connection()
     cur = conn.cursor()
     output = io.StringIO()
