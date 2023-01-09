@@ -37,7 +37,6 @@ jobs:
       postgres:
         image: timescale/timescaledb-ha:pg14-latest
         env:
-          POSTGRES_DATABASE: evellama_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports: ["5432:5432"]
@@ -67,7 +66,7 @@ jobs:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/evellama_test"
           RAILS_ENV: test
         run: |
-          bin/rails db:migrate
+          bin/rails db:create db:migrate
           bin/rspec --exclude-pattern 'spec/system/**/*_spec.rb'
         working-directory: backend
 
