@@ -25,7 +25,7 @@ jobs:
     runs-on: 'ubuntu-22.04'
     services:
       postgres:
-        image: timescale/timescaledb-ha:latest-pg14
+        image: timescale/timescaledb-ha:pg14-latest
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
