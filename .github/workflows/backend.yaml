@@ -53,6 +53,7 @@ jobs:
           working-directory: ./backend
       - name: Run tests
         run: bin/rspec --exclude-pattern 'spec/system/**/*_spec.rb'
+        working-directory: backend
 
   publish-image:
     name: Build and publish Docker image
