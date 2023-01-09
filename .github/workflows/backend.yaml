@@ -17,8 +17,16 @@ jobs:
     name: Run static analysis
     runs-on: 'ubuntu-22.04'
     steps:
-      - run: |
-          echo "Running static analysis tasks..."
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          working-directory: ./backend
+      - name: Run linters
+        run: bin/bundle-audit && bin/bundle-leak && bin/rubocop -P
+        working-directory: backend
 
   run-tests:
     name: Run tests
@@ -27,6 +35,7 @@ jobs:
       postgres:
         image: timescale/timescaledb-ha:pg14-latest
         env:
+          POSTGRES_DATABASE: evellama_test
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
         ports: ["5432:5432"]
@@ -52,6 +61,8 @@ jobs:
           bundler-cache: true
           working-directory: ./backend
       - name: Run tests
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@postgres/evellama_test"
         run: bin/rspec --exclude-pattern 'spec/system/**/*_spec.rb'
         working-directory: backend
 
