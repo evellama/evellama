@@ -25,9 +25,7 @@ jobs:
           bundler-cache: true
           working-directory: ./backend
       - name: Run linters
-        run: |
-          bin/bundle-audit
-          bin/rubocop -P
+        run: bundle exec rubocop -P
         working-directory: backend
 
   test:
@@ -66,8 +64,8 @@ jobs:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/evellama_test"
           RAILS_ENV: test
         run: |
-          bin/rails db:create db:migrate
-          bin/rspec --exclude-pattern 'spec/system/**/*_spec.rb'
+          bundle exec rails db:create db:migrate
+          bundle exec rspec --exclude-pattern 'spec/system/**/*_spec.rb'
         working-directory: backend
 
   docker:
