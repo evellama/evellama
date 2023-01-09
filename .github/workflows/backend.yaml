@@ -63,7 +63,10 @@ jobs:
       - name: Run tests
         env:
           DATABASE_URL: "postgresql://postgres:postgres@postgres/evellama_test"
-        run: bin/rspec --exclude-pattern 'spec/system/**/*_spec.rb'
+          RAILS_ENV: test
+        run: |
+          bin/rails db:migrate
+          bin/rspec --exclude-pattern 'spec/system/**/*_spec.rb'
         working-directory: backend
 
   publish-image:
