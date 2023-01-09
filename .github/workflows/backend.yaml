@@ -25,7 +25,10 @@ jobs:
           bundler-cache: true
           working-directory: ./backend
       - name: Run linters
-        run: bundle exec rubocop -P
+        run: |
+          echo $PWD
+          bundle show
+          bundle exec rubocop -P
         working-directory: backend
 
   test:
