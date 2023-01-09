@@ -110,10 +110,10 @@ jobs:
           tags: ${{ steps.meta-image.outputs.tags }}
           labels: ${{ steps.meta-image.outputs.labels }}
 
-  publish-chart:
+  chart:
     name: Publish Helm Chart
     needs:
-      - publish-image
+      - docker
     runs-on: 'ubuntu-22.04'
     steps:
       - run: |
@@ -121,7 +121,7 @@ jobs:
 
   deploy-staging:
     name: Deploy staging
-    needs: publish-chart
+    needs: chart
     concurrency: staging
     environment: Staging
     runs-on: 'ubuntu-22.04'

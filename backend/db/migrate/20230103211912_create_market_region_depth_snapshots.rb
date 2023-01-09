@@ -2,7 +2,7 @@
 
 class CreateMarketRegionDepthSnapshots < ActiveRecord::Migration[7.0]
   def change
-    create_table :market_region_depth_snapshots, id: false, primary_key: %i[timestamp region_id type_id] do |t|
+    create_table :market_region_depth_snapshots, id: false, primary_key: %i[timestamp region_id type_id] do |t| # rubocop:disable Rails/CreateTableWithTimestamps
       t.references :region, null: false, index: false
       t.references :type, null: false, index: false
 
@@ -26,7 +26,7 @@ class CreateMarketRegionDepthSnapshots < ActiveRecord::Migration[7.0]
         end
       end
 
-      dir.down do
+      dir.down do # rubocop:disable Lint/EmptyBlock
       end
     end
   end

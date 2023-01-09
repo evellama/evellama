@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ## Schema Information
 #
 # Table name: `market_region_depth_snapshots`
@@ -26,6 +28,6 @@
 #
 require 'rails_helper'
 
-RSpec.describe MarketRegionDepthSnapshot, type: :model do
+RSpec.describe MarketRegionDepthSnapshot do
   pending "add some examples to (or delete) #{__FILE__}"
 end

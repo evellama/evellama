@@ -17,6 +17,10 @@ AllCops:
     - 'tmp/*'
     - 'vendor/*'
 
+Lint/EmptyBlock:
+  Exclude:
+    - 'spec/factories/**/*.rb'
+
 Lint/EmptyClass:
   Enabled: false
 

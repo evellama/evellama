@@ -16,6 +16,6 @@
 class Corporation < ApplicationRecord
   belongs_to :alliance, optional: true
 
-  has_many :stations, foreign_key: :owner_id, dependent: :restrict_with_exception
-  has_many :structures, foreign_key: :owner_id, dependent: :restrict_with_exception
+  has_many :stations, foreign_key: :owner_id, inverse_of: :owner, dependent: :restrict_with_exception
+  has_many :structures, foreign_key: :owner_id, inverse_of: :owner, dependent: :restrict_with_exception
 end

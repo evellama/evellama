@@ -2,7 +2,7 @@
 
 class CreateAhoyVisitsAndEvents < ActiveRecord::Migration[7.0]
   def change
-    create_table :ahoy_visits do |t|
+    create_table :ahoy_visits do |t| # rubocop:disable Rails/CreateTableWithTimestamps
       t.text :browser
       t.text :device_type
       t.text :ip
@@ -21,7 +21,7 @@ class CreateAhoyVisitsAndEvents < ActiveRecord::Migration[7.0]
       t.text :visitor_token
     end
 
-    create_table :ahoy_events do |t|
+    create_table :ahoy_events do |t| # rubocop:disable Rails/CreateTableWithTimestamps
       t.references :visit, index: { name: :ahoy_events_visit_id_idx }
       t.references :user, index: { name: :ahoy_events_user_id_idx }
 

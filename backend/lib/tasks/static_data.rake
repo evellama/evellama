@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-namespace :static_data do
-  namespace :sde do
+namespace :static_data do # rubocop:disable Metrics/BlockLength
+  namespace :sde do # rubocop:disable Metrics/BlockLength
     desc 'Download the latest Static Data Export'
     task download: :environment do
       require 'down'
@@ -37,8 +37,8 @@ namespace :static_data do
     task import: %w[import:setup import:regions import:constellations import:solar_systems import:corporations
                     import:stations]
 
-    namespace :import do
-      task setup: :environment do
+    namespace :import do # rubocop:disable Metrics/BlockLength
+      task setup: :environment do # rubocop:disable Rake/Desc
         @names = YAML.load_file(Rails.root.join('tmp/sde/bsd/invNames.yaml')).each_with_object({}) do |i, h|
           h[i['itemID']] = i['itemName']
         end
@@ -47,82 +47,82 @@ namespace :static_data do
       desc 'Import regions from the Static Data Export'
       task regions: :setup do
         glob = Rails.root.join('tmp/sde/fsd/universe/**/region.staticdata')
-        records = Dir[glob].each_with_object([]) do |path, records|
+        records = Dir[glob].each_with_object([]) do |path, a|
           data = YAML.load_file(path)
-          records << {
+          a << {
             id: data['regionID'],
             name: @names[data['regionID']]
           }
         end
-        Region.upsert_all(records)
+        Region.upsert_all(records) # rubocop:disable Rails/SkipsModelValidations
       end
 
       desc 'Import constellations from the Static Data Export'
       task constellations: :setup do
         regions_glob = Rails.root.join('tmp/sde/fsd/universe/**/region.staticdata')
-        region_ids = Dir[regions_glob].each_with_object({}) do |path, region_ids|
+        region_ids = Dir[regions_glob].each_with_object({}) do |path, h|
           data = YAML.load_file(path)
-          region_ids[File.dirname(path)] = data['regionID']
+          h[File.dirname(path)] = data['regionID']
         end
 
         constellations_glob = Rails.root.join('tmp/sde/fsd/universe/**/constellation.staticdata')
-        records = Dir[constellations_glob].each_with_object([]) do |path, records|
+        records = Dir[constellations_glob].each_with_object([]) do |path, a|
           data = YAML.load_file(path)
           region_id = region_ids[File.dirname(path, 2)]
-          records << ({
+          a << ({
             id: data['constellationID'],
             name: @names[data['constellationID']],
             region_id:
           })
         end
-        Constellation.upsert_all(records)
+        Constellation.upsert_all(records) # rubocop:disable Rails/SkipsModelValidations
       end
 
       desc 'Import solar systems from the Static Data Export'
       task solar_systems: :setup do
         constellations_glob = Rails.root.join('tmp/sde/fsd/universe/**/constellation.staticdata')
-        constellation_ids = Dir[constellations_glob].each_with_object({}) do |path, constellation_ids|
+        constellation_ids = Dir[constellations_glob].each_with_object({}) do |path, h|
           data = YAML.load_file(path)
-          constellation_ids[File.dirname(path)] = data['constellationID']
+          h[File.dirname(path)] = data['constellationID']
         end
 
         systems_glob = Rails.root.join('tmp/sde/fsd/universe/**/solarsystem.staticdata')
-        records = Dir[systems_glob].each_with_object([]) do |path, records|
+        records = Dir[systems_glob].each_with_object([]) do |path, a|
           data = YAML.load_file(path)
           constellation_id = constellation_ids[File.dirname(path, 2)]
-          records << ({
+          a << ({
             id: data['solarSystemID'],
             name: @names[data['solarSystemID']],
             constellation_id:
           })
         end
-        SolarSystem.upsert_all(records)
+        SolarSystem.upsert_all(records) # rubocop:disable Rails/SkipsModelValidations
       end
 
       desc 'Import corporations from the Static Data Export'
       task corporations: :setup do
         data = YAML.load_file(Rails.root.join('tmp/sde/fsd/npcCorporations.yaml'))
-        records = data.each_with_object([]) do |(corporation_id, corporation), records|
-          records << {
+        records = data.each_with_object([]) do |(corporation_id, corporation), a|
+          a << {
             id: corporation_id,
             name: corporation['nameID']['en']
           }
         end
-        Corporation.upsert_all(records)
+        Corporation.upsert_all(records) # rubocop:disable Rails/SkipsModelValidations
       end
 
       desc 'Import stations from the Static Data Export'
       task stations: :setup do
         data = YAML.load_file(Rails.root.join('tmp/sde/bsd/staStations.yaml'))
-        records = data.each_with_object([]) do |station, records|
-          records << {
+        records = data.each_with_object([]) do |station, a|
+          a << {
             id: station['stationID'],
             name: station['stationName'],
             owner_id: station['corporationID'],
             solar_system_id: station['solarSystemID']
           }
         end
-        Station.upsert_all(records)
+        Station.upsert_all(records) # rubocop:disable Rails/SkipsModelValidations
       end
     end
   end

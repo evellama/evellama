@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ## Schema Information
 #
 # Table name: `market_region_depth_snapshots`
@@ -26,6 +28,5 @@
 #
 FactoryBot.define do
   factory :market_region_depth_snapshot do
-    
   end
 end
