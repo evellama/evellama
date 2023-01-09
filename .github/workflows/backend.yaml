@@ -1,4 +1,4 @@
-name: Deploy backend
+name: Backend
 
 on:
   pull_request:
@@ -13,8 +13,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-static-analysis:
-    name: Run static analysis
+  lint:
+    name: Lint
     runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout code
@@ -28,8 +28,8 @@ jobs:
         run: bin/bundle-audit && bin/bundle-leak && bin/rubocop -P
         working-directory: backend
 
-  run-tests:
-    name: Run tests
+  test:
+    name: Test (Unit)
     runs-on: 'ubuntu-22.04'
     services:
       postgres:
@@ -62,20 +62,20 @@ jobs:
           working-directory: ./backend
       - name: Run tests
         env:
-          DATABASE_URL: "postgresql://postgres:postgres@postgres/evellama_test"
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/evellama_test"
           RAILS_ENV: test
         run: |
           bin/rails db:migrate
           bin/rspec --exclude-pattern 'spec/system/**/*_spec.rb'
         working-directory: backend
 
-  publish-image:
-    name: Build and publish Docker image
+  docker:
+    name: Build Docker
     permissions:
       packages: write
     needs:
-      - run-static-analysis
-      - run-tests
+      - lint
+      - test
     runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout code
@@ -111,7 +111,7 @@ jobs:
           labels: ${{ steps.meta-image.outputs.labels }}
 
   publish-chart:
-    name: Publish Helm chart
+    name: Publish Helm Chart
     needs:
       - publish-image
     runs-on: 'ubuntu-22.04'
