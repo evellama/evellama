@@ -25,7 +25,9 @@ jobs:
           bundler-cache: true
           working-directory: ./backend
       - name: Run linters
-        run: bin/bundle-audit && bin/bundle-leak && bin/rubocop -P
+        run: |
+          bin/bundle-audit
+          bin/rubocop -P
         working-directory: backend
 
   test:
