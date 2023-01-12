@@ -638,7 +638,7 @@ GEM
     vcr (6.1.0)
     vega (0.3.0)
     version_gem (1.1.1)
-    view_component (2.80.0)
+    view_component (2.82.0)
       activesupport (>= 5.2.0, < 8.0)
       concurrent-ruby (~> 1.0)
       method_source (~> 1.0)
@@ -782,7 +782,7 @@ DEPENDENCIES
   typhoeus (~> 1.4)
   vcr (~> 6.1)
   vega (~> 0.3.0)
-  view_component (~> 2.80)
+  view_component (~> 2.82)
   web-console (~> 4.2)
   webmock (~> 3.18)
 
