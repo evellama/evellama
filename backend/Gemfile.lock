@@ -182,7 +182,7 @@ GEM
     cssbundling-rails (1.1.2)
       railties (>= 6.0.0)
     dalli (3.2.3)
-    database_consistency (1.7.1)
+    database_consistency (1.7.4)
       activerecord (>= 3.2)
     date (3.3.3)
     debug (1.7.1)
