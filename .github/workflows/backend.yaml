@@ -101,7 +101,7 @@ jobs:
             org.opencontainers.image.source="https://github.com/evellama/evellama/tree/main/backend"
             org.opencontainers.image.licenses="MIT"
       - name: Build and push image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: ./backend
           platforms: linux/amd64,linux/arm64
