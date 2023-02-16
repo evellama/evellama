@@ -289,7 +289,7 @@ wcwidth==0.2.5
 webcolors==1.12
 webencodings==0.5.1
 websocket-client==1.4.2
-werkzeug==2.2.2
+werkzeug==2.2.3
 widgetsnbextension==4.0.5
 wrapt==1.14.1
 wtforms==3.0.1
