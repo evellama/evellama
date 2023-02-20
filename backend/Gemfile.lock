@@ -172,7 +172,7 @@ GEM
     colorize (0.8.1)
     composite_primary_keys (14.0.4)
       activerecord (~> 7.0.2)
-    concurrent-ruby (1.1.10)
+    concurrent-ruby (1.2.0)
     connection_pool (2.3.0)
     crack (0.4.5)
       rexml
@@ -609,7 +609,7 @@ GEM
     stackprof (0.2.23)
     stimulus-rails (1.2.1)
       railties (>= 6.0.0)
-    strong_migrations (1.4.0)
+    strong_migrations (1.4.3)
       activerecord (>= 5.2)
     technical-analysis (0.2.4)
     terminal-table (3.0.2)
@@ -629,7 +629,7 @@ GEM
       railties (>= 6.0.0)
     typhoeus (1.4.0)
       ethon (>= 0.9.0)
-    tzinfo (2.0.5)
+    tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
       unf_ext
